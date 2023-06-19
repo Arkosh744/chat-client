@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/Arkosh744/auth-service-api v0.0.0-20230525181501-d9cdb683881a
-	github.com/Arkosh744/chat-server v0.0.0-20230618163806-f9b93912f11a
+	github.com/Arkosh744/chat-server v0.0.0-20230619180156-fbe03ad8d395
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.7.0

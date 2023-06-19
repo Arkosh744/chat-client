@@ -1,11 +1,11 @@
 package root
 
 import (
-	"log"
 	"os"
 	"strings"
 
 	"github.com/Arkosh744/chat-client/internal/app"
+	"github.com/Arkosh744/chat-client/internal/log"
 	"github.com/Arkosh744/chat-client/internal/model"
 	"github.com/spf13/cobra"
 )
@@ -18,7 +18,7 @@ var rootCmd = &cobra.Command{
 
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Что-то создает",
+	Short: "Вспомогательная команда для действий связанных с созданием",
 }
 
 var loginCmd = &cobra.Command{
@@ -40,7 +40,7 @@ var loginCmd = &cobra.Command{
 		serviceProvider := app.NewServiceProvider()
 		handlerService := serviceProvider.GetHandlerService(ctx)
 
-		err = handlerService.Login(ctx, &model.AuthInfo{
+		refToken, err := handlerService.Login(ctx, &model.AuthInfo{
 			Username: username,
 			Password: password,
 		})
@@ -48,7 +48,8 @@ var loginCmd = &cobra.Command{
 			log.Fatalf("failed to login: %s\n", err.Error())
 		}
 
-		log.Println("login success")
+		log.Info("log-in successfully")
+		log.Infof("your refresh token: %s", refToken)
 	},
 }
 
@@ -68,6 +69,11 @@ var createChatCmd = &cobra.Command{
 			log.Fatalf("failed to get usernames: %s\n", err.Error())
 		}
 
+		withHistory, err := cmd.Flags().GetBool("history")
+		if err != nil {
+			log.Fatalf("failed to get usernames: %s\n", err.Error())
+		}
+
 		usernames := strings.Split(usernamesStr, ",")
 		if len(usernames) == 0 {
 			log.Fatalf("usernames must be not empty")
@@ -76,12 +82,12 @@ var createChatCmd = &cobra.Command{
 		serviceProvider := app.NewServiceProvider()
 		handlerService := serviceProvider.GetHandlerService(ctx)
 
-		chatID, err := handlerService.CreateChat(ctx, usernames, refreshToken)
+		chatID, err := handlerService.CreateChat(ctx, usernames, refreshToken, withHistory)
 		if err != nil {
 			log.Fatalf("failed to create chat: %s\n", err.Error())
 		}
 
-		log.Printf("chat created with id: %s\n", chatID)
+		log.Infof("chat created with id: %s\n", chatID)
 	},
 }
 
@@ -109,7 +115,7 @@ var connectCmd = &cobra.Command{
 			log.Fatalf("failed to connect: %s\n", err.Error())
 		}
 
-		log.Println("chat finished")
+		log.Info("chat finished")
 	},
 }
 
@@ -163,4 +169,6 @@ func init() {
 	if err != nil {
 		log.Fatalf("failed to mark refresh-token flag required: %s", err.Error())
 	}
+
+	createChatCmd.Flags().Bool("history", false, "set true if you want save history of messages")
 }

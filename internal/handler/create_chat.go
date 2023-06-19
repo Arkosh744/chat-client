@@ -7,7 +7,7 @@ import (
 	"github.com/Arkosh744/chat-client/internal/model"
 )
 
-func (h *Handler) CreateChat(ctx context.Context, usernames []string, refreshToken string) (string, error) {
+func (h *Handler) CreateChat(ctx context.Context, usernames []string, refreshToken string, withHistory bool) (string, error) {
 	username, err := getNameFromRefreshToken(refreshToken)
 	if err != nil {
 		return "", fmt.Errorf("failed to handle refresh token: %w", err)
@@ -27,7 +27,7 @@ func (h *Handler) CreateChat(ctx context.Context, usernames []string, refreshTok
 	}
 
 	ctx = context.WithValue(ctx, model.UserNameKey, username)
-	chatID, err := h.chatClient.CreateChat(ctx, usernames)
+	chatID, err := h.chatClient.CreateChat(ctx, usernames, withHistory)
 	if err != nil {
 		return "", err
 	}

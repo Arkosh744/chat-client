@@ -5,11 +5,11 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/Arkosh744/chat-client/internal/log"
 	"github.com/Arkosh744/chat-client/internal/model"
 )
 
@@ -42,40 +42,34 @@ func (h *Handler) ConnectChat(ctx context.Context, chatID string, refreshToken s
 					return
 				}
 
-				log.Println("failed to receive message from stream: ", errRecv)
-				return
+				log.Errorf("failed to receive message from stream: %s", errRecv)
+				continue
 			}
 
-			log.Printf("[%v] - [from: %s]: %s\n", message.GetCreatedAt(), message.GetFrom(), message.GetText())
+			log.Infof("[%v] %s: %s",
+				message.GetCreatedAt().AsTime().Format("2006-01-02 15:04:05"),
+				message.GetFrom(),
+				message.GetText(),
+			)
 		}
 	}()
 
+	reader := bufio.NewReader(os.Stdin)
 	for {
-		scanner := bufio.NewScanner(os.Stdin)
-		var lines strings.Builder
-
-		for {
-			scanner.Scan()
-			line := scanner.Text()
-			if len(line) == 0 {
-				break
-			}
-
-			lines.WriteString(line)
-			lines.WriteString("\n")
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			log.Errorf("failed to read from stdin: %s", err)
+			continue
 		}
 
-		if err = scanner.Err(); err != nil {
-			log.Println("failed to scan message: ", err)
-		}
+		input = strings.Replace(input, "\n", "", -1)
 
 		if err = h.chatClient.SendMessage(ctx, chatID, &model.Message{
 			From:      username,
-			Text:      lines.String(),
+			Text:      input,
 			CreatedAt: time.Now(),
 		}); err != nil {
-			log.Println("failed to send message: ", err)
-			return err
+			log.Errorf("failed to send message: %s", err)
 		}
 	}
 }

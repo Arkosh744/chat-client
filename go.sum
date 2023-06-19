@@ -1,7 +1,7 @@
 github.com/Arkosh744/auth-service-api v0.0.0-20230525181501-d9cdb683881a h1:n+tdODf+UsR76lyFd7dvaorFL3Y06Vo0y12UCP0nz4Q=
 github.com/Arkosh744/auth-service-api v0.0.0-20230525181501-d9cdb683881a/go.mod h1:al/M9sywsT+tqlPDCH3/2+IMWRF9aZvpRKNeqOs/53c=
-github.com/Arkosh744/chat-server v0.0.0-20230618163806-f9b93912f11a h1:6rXKQ3cG2ec7YRU36sWDgN9ll7dHuizfT3/lVubSFsc=
-github.com/Arkosh744/chat-server v0.0.0-20230618163806-f9b93912f11a/go.mod h1:kVvnM9j81EHty0csDHJa03rquu3q4ea/A0n8nvYv5LY=
+github.com/Arkosh744/chat-server v0.0.0-20230619180156-fbe03ad8d395 h1:iX6wiPIgIAl0F9kSqMCWSRU6ALFIEHpsI+7TBtWVznU=
+github.com/Arkosh744/chat-server v0.0.0-20230619180156-fbe03ad8d395/go.mod h1:kVvnM9j81EHty0csDHJa03rquu3q4ea/A0n8nvYv5LY=
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

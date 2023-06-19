@@ -12,8 +12,8 @@ import (
 var _ Client = (*client)(nil)
 
 type Client interface {
-	CreateChat(ctx context.Context, usernames []string) (string, error)
-	ConnectToChat(ctx context.Context, chatID string, username string) (chatV1.ChatV1_ConnectChatClient, error)
+	CreateChat(ctx context.Context, usernames []string, withHistory bool) (string, error)
+	ConnectToChat(ctx context.Context, chatID string, username string) (chatV1.ChatV1_ConnectToChatClient, error)
 	SendMessage(ctx context.Context, chatID string, message *model.Message) error
 	AddUserToChat(ctx context.Context, chatID string, username string) error
 }
@@ -28,9 +28,10 @@ func NewClient(cc *grpc.ClientConn) *client {
 	}
 }
 
-func (c *client) CreateChat(ctx context.Context, usernames []string) (string, error) {
+func (c *client) CreateChat(ctx context.Context, usernames []string, withHistory bool) (string, error) {
 	res, err := c.client.CreateChat(ctx, &chatV1.CreateChatRequest{
-		Usernames: usernames,
+		Usernames:   usernames,
+		SaveHistory: withHistory,
 	})
 	if err != nil {
 		return "", err
@@ -39,8 +40,8 @@ func (c *client) CreateChat(ctx context.Context, usernames []string) (string, er
 	return res.GetChatId(), nil
 }
 
-func (c *client) ConnectToChat(ctx context.Context, chatID string, username string) (chatV1.ChatV1_ConnectChatClient, error) {
-	return c.client.ConnectChat(ctx, &chatV1.ConnectChatRequest{
+func (c *client) ConnectToChat(ctx context.Context, chatID string, username string) (chatV1.ChatV1_ConnectToChatClient, error) {
+	return c.client.ConnectToChat(ctx, &chatV1.ConnectChatRequest{
 		ChatId:   chatID,
 		Username: username,
 	})
