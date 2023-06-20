@@ -29,12 +29,19 @@ func (h *Handler) ConnectChat(ctx context.Context, chatID string, refreshToken s
 	}
 
 	ctx = context.WithValue(ctx, model.UserNameKey, username)
+
+	if _, err = h.chatClient.GetChat(ctx, chatID); err != nil {
+		return err
+	}
+
 	stream, err := h.chatClient.ConnectToChat(ctx, chatID, username)
 	if err != nil {
 		return err
 	}
 
 	go func() {
+		retries := 0
+
 		for {
 			message, errRecv := stream.Recv()
 			if errRecv != nil {
@@ -42,9 +49,17 @@ func (h *Handler) ConnectChat(ctx context.Context, chatID string, refreshToken s
 					return
 				}
 
+				retries++
+				if retries > 5 {
+					log.Errorf("Close connect to the stream because too much fails: %s", errRecv)
+					return
+				}
+
 				log.Errorf("failed to receive message from stream: %s", errRecv)
 				continue
 			}
+
+			retries = 0
 
 			log.Infof("[%v] %s: %s",
 				message.GetCreatedAt().AsTime().Format("2006-01-02 15:04:05"),
@@ -70,6 +85,8 @@ func (h *Handler) ConnectChat(ctx context.Context, chatID string, refreshToken s
 			CreatedAt: time.Now(),
 		}); err != nil {
 			log.Errorf("failed to send message: %s", err)
+
+			return err
 		}
 	}
 }

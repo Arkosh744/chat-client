@@ -119,6 +119,36 @@ var connectCmd = &cobra.Command{
 	},
 }
 
+var addCmd = &cobra.Command{
+	Use:   "add",
+	Short: "Добавить юзера в к существующему чату",
+	Run: func(cmd *cobra.Command, args []string) {
+		ctx := cmd.Context()
+
+		refreshToken, err := cmd.Flags().GetString("refresh-token")
+		if err != nil {
+			log.Fatalf("failed to get refresh token: %s\n", err.Error())
+		}
+
+		chatID, err := cmd.Flags().GetString("chat-id")
+		if err != nil {
+			log.Fatalf("failed to get chat id: %s\n", err.Error())
+		}
+
+		username, err := cmd.Flags().GetString("username")
+		if err != nil {
+			log.Fatalf("failed to get username: %s\n", err.Error())
+		}
+
+		serviceProvider := app.NewServiceProvider()
+		handlerService := serviceProvider.GetHandlerService(ctx)
+
+		if err = handlerService.AddToChat(ctx, chatID, username, refreshToken); err != nil {
+			log.Fatalf("failed to add user to chat: %s\n", err.Error())
+		}
+	},
+}
+
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
@@ -129,11 +159,75 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(loginCmd)
-	rootCmd.AddCommand(createCmd)
-	rootCmd.AddCommand(connectCmd)
-	createCmd.AddCommand(createChatCmd)
+	initLogin()
 
+	initCreateChat()
+
+	initAddToChat()
+
+	initConnect()
+}
+
+func initCreateChat() {
+	rootCmd.AddCommand(createCmd)
+	createCmd.AddCommand(createChatCmd)
+	createChatCmd.Flags().StringP("usernames", "u", "", "List of usernames for chat")
+
+	err := createChatCmd.MarkFlagRequired("usernames")
+	if err != nil {
+		log.Fatalf("failed to mark usernames flag required: %s", err.Error())
+	}
+
+	createChatCmd.Flags().StringP("refresh-token", "r", "", "provide refresh token to check access")
+	err = createChatCmd.MarkFlagRequired("refresh-token")
+	if err != nil {
+		log.Fatalf("failed to mark refresh-token flag required: %s", err.Error())
+	}
+
+	// not required
+	createChatCmd.Flags().Bool("history", false, "set true if you want save history of messages")
+}
+
+func initAddToChat() {
+	rootCmd.AddCommand(addCmd)
+	addCmd.Flags().StringP("refresh-token", "r", "", "provide refresh token to check access")
+
+	err := addCmd.MarkFlagRequired("refresh-token")
+	if err != nil {
+		log.Fatalf("failed to mark refresh-token flag required: %s", err.Error())
+	}
+
+	addCmd.Flags().StringP("chat-id", "c", "", "Chat id")
+	err = addCmd.MarkFlagRequired("chat-id")
+	if err != nil {
+		log.Fatalf("failed to mark chat-id flag required: %s", err.Error())
+	}
+
+	addCmd.Flags().StringP("username", "u", "", "Username for chat")
+	err = addCmd.MarkFlagRequired("username")
+	if err != nil {
+		log.Fatalf("failed to mark usernames flag required: %s", err.Error())
+	}
+}
+
+func initConnect() {
+	rootCmd.AddCommand(connectCmd)
+	connectCmd.Flags().StringP("chat-id", "c", "", "Chat id")
+
+	err := connectCmd.MarkFlagRequired("chat-id")
+	if err != nil {
+		log.Fatalf("failed to mark chat-id flag required: %s", err.Error())
+	}
+
+	connectCmd.Flags().StringP("refresh-token", "r", "", "provide refresh token to check access")
+	err = connectCmd.MarkFlagRequired("refresh-token")
+	if err != nil {
+		log.Fatalf("failed to mark refresh-token flag required: %s", err.Error())
+	}
+}
+
+func initLogin() {
+	rootCmd.AddCommand(loginCmd)
 	loginCmd.Flags().StringP("username", "u", "", "Имя пользователя")
 	err := loginCmd.MarkFlagRequired("username")
 	if err != nil {
@@ -145,30 +239,4 @@ func init() {
 	if err != nil {
 		log.Fatalf("failed to mark password flag as required: %s\n", err.Error())
 	}
-
-	connectCmd.Flags().StringP("chat-id", "c", "", "Chat id")
-	err = connectCmd.MarkFlagRequired("chat-id")
-	if err != nil {
-		log.Fatalf("failed to mark chat-id flag required: %s", err.Error())
-	}
-
-	connectCmd.Flags().StringP("refresh-token", "r", "", "provide refresh token to check access")
-	err = connectCmd.MarkFlagRequired("refresh-token")
-	if err != nil {
-		log.Fatalf("failed to mark refresh-token flag required: %s", err.Error())
-	}
-
-	createChatCmd.Flags().StringP("usernames", "u", "", "List of usernames for chat")
-	err = createChatCmd.MarkFlagRequired("usernames")
-	if err != nil {
-		log.Fatalf("failed to mark usernames flag required: %s", err.Error())
-	}
-
-	createChatCmd.Flags().StringP("refresh-token", "r", "", "provide refresh token to check access")
-	err = createChatCmd.MarkFlagRequired("refresh-token")
-	if err != nil {
-		log.Fatalf("failed to mark refresh-token flag required: %s", err.Error())
-	}
-
-	createChatCmd.Flags().Bool("history", false, "set true if you want save history of messages")
 }
