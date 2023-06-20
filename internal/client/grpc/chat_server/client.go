@@ -13,6 +13,7 @@ var _ Client = (*client)(nil)
 
 type Client interface {
 	CreateChat(ctx context.Context, usernames []string, withHistory bool) (string, error)
+	GetChat(ctx context.Context, chatID string) (*chatV1.GetChatResponse, error)
 	ConnectToChat(ctx context.Context, chatID string, username string) (chatV1.ChatV1_ConnectToChatClient, error)
 	SendMessage(ctx context.Context, chatID string, message *model.Message) error
 	AddUserToChat(ctx context.Context, chatID string, username string) error
@@ -38,6 +39,12 @@ func (c *client) CreateChat(ctx context.Context, usernames []string, withHistory
 	}
 
 	return res.GetChatId(), nil
+}
+
+func (c *client) GetChat(ctx context.Context, chatID string) (*chatV1.GetChatResponse, error) {
+	return c.client.GetChat(ctx, &chatV1.GetChatRequest{
+		ChatId: chatID,
+	})
 }
 
 func (c *client) ConnectToChat(ctx context.Context, chatID string, username string) (chatV1.ChatV1_ConnectToChatClient, error) {

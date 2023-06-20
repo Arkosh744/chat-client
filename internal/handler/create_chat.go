@@ -19,7 +19,7 @@ func (h *Handler) CreateChat(ctx context.Context, usernames []string, refreshTok
 	}
 
 	if !exist {
-		return "", fmt.Errorf("refresh token does not exist. please re-login")
+		return "", fmt.Errorf("refresh token does not exist. please re-login and get new")
 	}
 
 	if !containsString(usernames, username) {

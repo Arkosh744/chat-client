@@ -7,11 +7,11 @@ To run this project you need to run services from this repos:
 Then for build use this command:
 `go build -o main cmd/main.go`
 
-After build we use this commands:
-- To login you should be registered user in the auth service, then
+After build, we use this commands:
+- To login, you should be registered user in the auth service, then
 - login: `./main --username login --password password`
 - Create chat: `./main create chat --refresh-token your.token.here --usernames user1,user2,user3`
-- after that you will get chat uuid and you can connect to this chat
+- after that you will get chat uuid, and you can connect to this chat
 - Connect to chat: `./main connect --refresh-token your.token.here --chat-id chatUUID`
 
 For example:
