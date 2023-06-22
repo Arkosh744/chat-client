@@ -1,11 +1,11 @@
 package redis
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/Arkosh744/chat-client/internal/model"
 	"github.com/go-redis/redis"
 )
 
@@ -16,7 +16,6 @@ type Client interface {
 	Get(key string) (string, error)
 	Set(key string, value interface{}, expiration time.Duration) error
 	GetAllUsers() ([]string, error)
-	RefreshTokenExist(username, refresh string) (bool, error)
 
 	Close() error
 }
@@ -37,9 +36,14 @@ func (c *client) Ping() error {
 	return c.client.Ping().Err()
 }
 
+// Get - if key does not found - return empty string without error
 func (c *client) Get(key string) (string, error) {
 	res, err := c.client.Get(key).Result()
 	if err != nil {
+		if errors.Is(redis.Nil, err) {
+			return "", nil
+		}
+
 		return "", err
 	}
 
@@ -71,18 +75,4 @@ func (c *client) GetAllUsers() ([]string, error) {
 	}
 
 	return users, nil
-}
-
-func (c *client) RefreshTokenExist(username, refresh string) (bool, error) {
-	refreshToken, err := c.Get(model.BuildRedisRefreshKey(username))
-	if err != nil {
-		if err == redis.Nil {
-			return false, nil
-		}
-
-		return false, err
-	}
-
-	return refreshToken == refresh, nil
-
 }
