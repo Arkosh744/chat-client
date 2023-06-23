@@ -14,7 +14,7 @@ var addCmd = &cobra.Command{
 
 		user, err := cmd.Flags().GetString("user")
 		if err != nil {
-			log.Fatalf("failed to get refresh token: %s\n", err.Error())
+			log.Fatalf("failed to get user: %s\n", err.Error())
 		}
 
 		chatID, err := cmd.Flags().GetString("chat-id")
@@ -33,6 +33,8 @@ var addCmd = &cobra.Command{
 		if err = handlerService.AddToChat(ctx, chatID, user, addUser); err != nil {
 			log.Fatalf("failed to add user to chat: %s\n", err.Error())
 		}
+
+		log.Infof("user: %s added to chat: %s\n", addUser, chatID)
 	},
 }
 
