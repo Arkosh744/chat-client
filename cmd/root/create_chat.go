@@ -52,9 +52,6 @@ var createChatCmd = &cobra.Command{
 }
 
 func initCreateChat() {
-	rootCmd.AddCommand(createCmd)
-	createCmd.AddCommand(createChatCmd)
-
 	createChatCmd.Flags().StringP("usernames", "", "", "List of usernames for chat")
 	err := createChatCmd.MarkFlagRequired("usernames")
 	if err != nil {

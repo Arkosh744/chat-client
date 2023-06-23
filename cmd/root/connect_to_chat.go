@@ -35,7 +35,6 @@ var connectCmd = &cobra.Command{
 }
 
 func initConnect() {
-	rootCmd.AddCommand(connectCmd)
 
 	connectCmd.Flags().StringP("chat-id", "c", "", "Chat id")
 	err := connectCmd.MarkFlagRequired("chat-id")

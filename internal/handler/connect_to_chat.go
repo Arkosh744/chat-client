@@ -32,12 +32,16 @@ func (h *Handler) ConnectChat(ctx context.Context, chatID string, user string) e
 
 	stream, err := h.chatClient.ConnectToChat(ctx, chatID, user)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect to chat: %w", err)
 	}
 
 	go getMessages(stream)
 
-	return h.loopSendMessage(ctx, chatID, user)
+	if err = h.loopSendMessage(ctx, chatID, user); err != nil {
+		return fmt.Errorf("failed to send message: %w", err)
+	}
+
+	return nil
 }
 
 func (h *Handler) loopSendMessage(ctx context.Context, chatID string, user string) error {

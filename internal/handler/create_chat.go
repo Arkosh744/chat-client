@@ -1,3 +1,4 @@
+// будешь хуйню писать, пиши
 package handler
 
 import (

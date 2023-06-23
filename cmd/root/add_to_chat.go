@@ -39,7 +39,6 @@ var addCmd = &cobra.Command{
 }
 
 func initAddToChat() {
-	rootCmd.AddCommand(addCmd)
 
 	addCmd.Flags().StringP("user", "u", "", "provide username to check access")
 	err := addCmd.MarkFlagRequired("user")
